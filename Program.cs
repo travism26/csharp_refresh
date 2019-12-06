@@ -16,7 +16,8 @@ namespace csharp
             this.age = age;
         }
 
-        public String getName(){
+        public String getName()
+        {
             return this.name;
         }
     }
@@ -34,9 +35,9 @@ namespace csharp
 
     interface IAccountType
     {
-        int getBalance();
-        int credit(int amount);
-        int debit(int amount);
+        double getBalance();
+        double credit(int amount);
+        double debit(int amount);
     }
 
     // TESTING PURPOSES IN MEMORY DB
@@ -47,9 +48,10 @@ namespace csharp
         void update(String objectName, ITableRepo repo);
     }
 
-// sooooo I want to save multi types of information, how about we create a interface and each
-// table orrr data point repo (users, bank account, ...etc) might be a bad idea but lets try it.
-    interface ITableRepo {
+    // sooooo I want to save multi types of information, how about we create a interface and each
+    // table orrr data point repo (users, bank account, ...etc) might be a bad idea but lets try it.
+    interface ITableRepo
+    {
         // we can leave empty for now
     }
 
@@ -57,18 +59,23 @@ namespace csharp
     interface IAccountOwner
     {
         String getAccountOwnerName();
-        int getAccountBalance(IAccountType accountType);
+        double getAccountBalance(IAccountType accountType);
+        IAccountType GetAccount();
     }
 
     class PersonalAccount : IAccountOwner
     {
 
-// Stringly coupled `PersonAccount + Person` meh kinda a code smell but can refactor later once working...
-// easy fix create interface maybe...donno will get back to later.
+        // Stringly coupled `PersonAccount + Person` meh kinda a code smell but can refactor later once working...
+        // easy fix create interface maybe...donno will get back to later.
         Person accountOwner;
-        PersonalAccount(Person accountOwnerIn) => this.accountOwner = accountOwnerIn;
+        IAccountType accountType;
+        public PersonalAccount(Person accountOwnerIn, IAccountType accountTypeIn){
+            this.accountOwner =accountOwnerIn;
+            this.accountType = accountTypeIn;
+        }
 
-        public int getAccountBalance(IAccountType accountType)
+        public double getAccountBalance(IAccountType accountType)
         {
             return accountType.getBalance();
         }
@@ -77,36 +84,66 @@ namespace csharp
         {
             return this.accountOwner.getName();
         }
+
+        public IAccountType GetAccount(){
+            return this.accountType;
+        }
     }
 
     class ChequingAccount : IAccountType
     {
 
-        
+        double balance = 0;
+        bool accountLocked = true;
+        Dictionary<int, double> transactionHistory = new Dictionary<int, double>();
+
+        public ChequingAccount(double accountBalance, bool accountLocked)
+        {
+            this.balance = accountBalance;
+            this.accountLocked = accountLocked;
+        }
         // Some user object that `OWNS` the `ACCOUNT` we need to create the use class.
         // This is a BANK account
-        public int credit(int amount)
+        public double credit(int amount)
         {
-            throw new NotImplementedException();
+            updateTransactionHistory(amount); // we can add error checking roll back transaction here with a bool swap void->bool
+            this.balance += amount;
+            return this.balance;
         }
 
-        public int debit(int amount)
+        public double debit(int amount)
         {
-            throw new NotImplementedException();
+            double debitValue = amount * -1; // simple way to get a negative value 
+            updateTransactionHistory(debitValue); // we can add error checking roll back transaction here with a bool swap void->bool
+            this.balance += debitValue;
+            return this.balance;
         }
 
-        public int getBalance()
+        public double getBalance()
         {
-            throw new NotImplementedException();
+            return this.balance;
+        }
+
+// keep track of that transaction history.
+        private void updateTransactionHistory(double amount)
+        {
+            int transactionNumber = getNextID(this.transactionHistory);
+            this.transactionHistory.Add(transactionNumber, amount);
+        }
+
+        public int getNextID(Dictionary<int, double> input)
+        {
+            if (input.Count() == 0)
+            {
+                return 1;
+            }
+            int nextBigID = input.Keys.Max() + 1;
+            return nextBigID;
         }
     }
 
-    class UserTable : ITableRepo {
-        Dictionary<int, Person> usersDB = new Dictionary<int, Person>();
-
-    }
-
-    interface IUserRepo {
+    interface IUserRepo
+    {
         int CreateUser(Person user);
         bool DeleteUser(int userId);
         Person getUser(int userId);
@@ -117,7 +154,7 @@ namespace csharp
     {
         Dictionary<int, Person> userDB = new Dictionary<int, Person>();
 
-        public InMemoryUserDB(){}
+        public InMemoryUserDB() { }
         public int CreateUser(Person user)
         {
             userDB.Add(getNextID(userDB), user);
@@ -125,12 +162,14 @@ namespace csharp
             return userDB.Keys.Max();
         }
 
-        public int getNextID(Dictionary<int, Person> userDB) {
+        public int getNextID(Dictionary<int, Person> userDB)
+        {
 
-            if(userDB.Count() == 0) {
+            if (userDB.Count() == 0)
+            {
                 return 1;
             }
-            int nextBigID = userDB.Keys.Max()+1;
+            int nextBigID = userDB.Keys.Max() + 1;
             return nextBigID;
         }
 
@@ -146,13 +185,63 @@ namespace csharp
         }
     }
 
-    class BigBadBank {
+    interface IAccountDBRepo
+    {
+        int CreateAccount(IAccountType accountType);
+        bool DeleteAccount(int accountID);
+        IAccountType GetAccount(int accountID);
+    }
+
+    class InMemoryAccountRepo : IAccountDBRepo
+    {
+
+        Dictionary<int, IAccountType> accountDB = new Dictionary<int, IAccountType>();
+        public int CreateAccount(IAccountType accountType)
+        {
+            int accountNumber = getNextID(this.accountDB);
+            this.accountDB.Add(accountNumber, accountType);
+            return accountNumber;
+        }
+
+        public bool DeleteAccount(int accountID)
+        {
+            return this.accountDB.Remove(accountID); // validation? meh maybe later once complete I know know NOT Secure coding
+        }
+
+        public IAccountType GetAccount(int accountID)
+        {
+            return this.accountDB[accountID]; // again no validation but ill get to later...
+            // i know we can use an interface to auto pass validation later but ill do later...
+        }
+        public int getNextID(Dictionary<int, IAccountType> accountDB)
+        {
+
+            if (accountDB.Count() == 0)
+            {
+                return 1;
+            }
+            int nextBigID = accountDB.Keys.Max() + 1;
+            return nextBigID;
+        }
+    }
+
+    class BigBadBank
+    {
 
         static void Main(string[] args)
         {
+            // our user repo this can be a DB or something like that impl the repo service.
             IUserRepo userRepo = new InMemoryUserDB();
-
+            IAccountDBRepo accountDBRepo = new InMemoryAccountRepo();
+            
+            // Create a user for the bank
             Person travis = new Person("Travis", 22);
+            // create a new Personal Bank Account and attach `travis` to the bank account with 100 bucks.
+            IAccountOwner TravisAccount = new PersonalAccount(travis, new ChequingAccount(100.5, false));
+            
+            double travsBalance = TravisAccount.GetAccount().credit(50);
+
+            Console.WriteLine("Balance:"+travsBalance);
 
             userRepo.CreateUser(travis);
         }
