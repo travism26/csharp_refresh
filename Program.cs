@@ -55,7 +55,7 @@ namespace csharp
         // This is a BANK account
         public double credit(int amount)
         {
-            Console.WriteLine("We are attempting to credit the account with:"+ amount);
+            Console.WriteLine("We are attempting to credit the account with:" + amount);
             updateTransactionHistory(amount); // we can add error checking roll back transaction here with a bool swap void->bool
             this.balance += amount;
             return this.balance;
@@ -63,7 +63,7 @@ namespace csharp
 
         public double debit(int amount)
         {
-            Console.WriteLine("We are attempting to debit the account with:"+ amount);
+            Console.WriteLine("We are attempting to debit the account with:" + amount);
             double debitValue = amount * -1; // simple way to get a negative value 
             updateTransactionHistory(debitValue); // we can add error checking roll back transaction here with a bool swap void->bool
             this.balance += debitValue;
@@ -126,8 +126,9 @@ namespace csharp
             List<IAccountOwner> allAccountOwnerList = new List<IAccountOwner>();
             allAccountOwnerList.Add(tomsAccount);
             allAccountOwnerList.Add(TravisAccount);
-            double totalBalance =0;
-            foreach(PersonalAccount owner in allAccountOwnerList){
+            double totalBalance = 0;
+            foreach (PersonalAccount owner in allAccountOwnerList)
+            {
                 totalBalance += owner.getAccountBalance();
             }
             Console.WriteLine("Total stored by bank:" + totalBalance);
@@ -136,6 +137,9 @@ namespace csharp
             Console.WriteLine("-----------------THIS IS NOW THE OOP STUFF-----------------");
 
             csharp.oop_examples.runnable.carExample();
+
+            Console.WriteLine("-----------------THIS IS NOW THE Coding challenge STUFF-----------------");
+            csharp.BinaryGap.binaryGap();
         }
     }
 }
