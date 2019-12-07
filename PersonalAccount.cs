@@ -1,5 +1,17 @@
+using System;
+
 namespace csharp
 {
+
+    // Doing this to keep it abstract...abstration is the an ally.
+    // since there can be multiple type of accounts: Personal, Business, private? ...etc
+    interface IAccountOwner
+    {
+        String getAccountOwnerName();
+        double getAccountBalance();
+        IAccountType GetAccount();
+    }
+
 
     class PersonalAccount : IAccountOwner
     {
@@ -14,9 +26,9 @@ namespace csharp
             this.accountType = accountTypeIn;
         }
 
-        public double getAccountBalance(IAccountType accountType)
+        public double getAccountBalance()
         {
-            return accountType.getBalance();
+            return this.accountType.getBalance();
         }
 
         public string getAccountOwnerName()
