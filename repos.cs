@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace csharp
 {
-    
+
     interface IUserRepo
     {
-        int CreateUser(Person user);
+        int CreateUser(Person user); // this can be further abstracted to an interface.
         bool DeleteUser(int userId);
-        Person getUser(int userId);
+        Person getUser(int userId); // this can be further abstracted to an interface.
     }
 
     // Add the DB stuff here
@@ -22,7 +22,7 @@ namespace csharp
         {
             int userId = getNextID(userDB);
             userDB.Add(userId, user);
-            Console.WriteLine("Created User" + user.getName());
+            Console.WriteLine("Created User:" + user.getName());
             return userId;
         }
 
