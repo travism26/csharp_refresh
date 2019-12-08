@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace csharp
 {
@@ -49,6 +51,40 @@ namespace csharp
             Console.WriteLine("Solution:"+ answer);
 
             // done! 7:06
+        }
+    }
+
+    public class unpairedElements {
+
+        public int solution(int[] A) {
+            // STARTING 7:52pm
+
+            // 1) create a hashmap or Dictionary like so `pairs[value] = OCCURANCE`
+            // 2) look for where the `OCCURANCE` == 1 return the `KEY`
+
+            Dictionary<int, int> pairs = new Dictionary<int, int>();
+
+            foreach(int val in A){
+                if(pairs.ContainsKey(val)) {
+                    pairs[val] += 1;
+                } else {
+                    pairs.Add(val, 1);
+                }
+            }
+
+            // gotta be an easy way to get key by VALUE!
+            int allAlone = pairs.FirstOrDefault(x => x.Value == 1).Key; 
+            return allAlone;
+
+            // done 8:01pm
+        }
+
+        public static void unpairedElementSolution()
+        {
+            unpairedElements obj = new unpairedElements();
+            int[] testArray = {1, 2, 3, 3, 1, 2, 9, 9, 8};
+            int output = obj.solution(testArray);
+            Console.WriteLine("single number:"+output);
         }
     }
 }
