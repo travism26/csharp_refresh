@@ -92,7 +92,6 @@ namespace csharp
             return nextBigID;
         }
     }
-
     class BigBadBank
     {
         static void Main(string[] args)
@@ -141,6 +140,9 @@ namespace csharp
             Console.WriteLine("-----------------THIS IS NOW THE Coding challenge STUFF-----------------");
             csharp.BinaryGap.binaryGap();
             csharp.unpairedElements.unpairedElementSolution();
+            
         }
     }
+
+
 }
