@@ -37,4 +37,7 @@ userRepo.CreateUser(travis);
 5) Did my code work? all the objects work and communicate correctly? spolier `yes` they did.
 6) create my user just to see if my user repo works...
 
+
+added some stuff from https://app.codility.com/programmers/lessons/1-iterations/
+
 - SBT
